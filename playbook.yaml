@@ -18,6 +18,9 @@
   - name: install mariadb configuration
     template: src=my.cnf dest=/etc/my.cnf owner=mysql
 
+  - name: adjust vendor configuration for mariadb
+    lineinfile: dest=/etc/mysql/my.cnf state=absent regexp="^bind-address"
+
 - hosts: machine1
   become: yes
   tasks:
@@ -35,4 +38,9 @@
   - name: start the rest of the cluster
     service: state=started name=mysql
 
+- hosts: machine1
+  become: yes
+  tasks:
 
+  - name: make root user (password=letmein)
+    shell: mysql --user=root -e "GRANT ALL ON *.* TO 'root'@'192.168.%' IDENTIFIED BY 'letmein' WITH GRANT OPTION;"
