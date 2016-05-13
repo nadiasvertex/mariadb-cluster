@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: machine1, machine2, machine3, machine4, machine5
   become: yes
   tasks:
 
@@ -43,4 +43,27 @@
   tasks:
 
   - name: make root user (password=letmein)
-    shell: mysql --user=root -e "GRANT ALL ON *.* TO 'root'@'192.168.%' IDENTIFIED BY 'letmein' WITH GRANT OPTION;"
+    shell: mysql --user=root -e "{{item}}"
+    with_items:
+    - "GRANT ALL ON *.* TO 'root'@'192.168.%' IDENTIFIED BY 'letmein' WITH GRANT OPTION;"
+    - "CREATE USER 'haproxy'@'192.168.77.26';"
+
+  - name: restart first node
+    service: state=restarted name=mysql
+
+- hosts: machine6
+  become: yes
+  tasks:
+
+  - name: install haproxy
+    apt: state=present name=haproxy
+
+  - name: update haproxy configuration
+    copy: src=haproxy.cfg dest=/etc/haproxy/haproxy.cfg 
+
+  - name: enable haproxy
+    lineinfile: state=present dest=/etc/default/haproxy line="ENABLED=1"
+ 
+  - name: restart haproxy
+    service: state=restarted name=haproxy enabled=yes
+

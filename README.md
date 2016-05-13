@@ -1,15 +1,22 @@
 # mariadb-cluster
-Provides a script and Vagrantfile to build a MariaDB cluster ready for geographical replication.
+Provides a script and Vagrantfile to build a MariaDB cluster ready for geographical replication. Also installs
+a proxy VM running HAProxy. A geo replication setup wouldn't use HAProxy this way, but a group of clusters would.
+For example, there are 5 machines in Datacenter A, 5 in Datacenter B, and 5 in Datacenter C. Each group of 5 would
+be behind an HAProxy instance in order to distribute load, but users in various regions would be sent to the nearest
+proxy frontend.
 
 To run, simply execute ./boot.sh
 
-After the cluster is booted you can connect to any node:
+After the cluster is booted you can connect to any node. Nodes .21-.25 are data nodes. Node .26 is the HAProxy
+instance, which is configured to balance to the least-connected machine.
+
+To connect to the proxy:
 
 ```
-mysql --user=root --host=192.168.77.23 --password=letmein
+mysql --user=root --host=192.168.77.26 --password=letmein
 ```
 
-You should see 
+You should see: 
 
 ```
 Welcome to the MariaDB monitor.  Commands end with ; or \g.
@@ -29,7 +36,7 @@ You can check the state of the cluster with:
 SHOW GLOBAL STATUS LIKE 'wsrep_%';
 ```
 
-That will show a lot of data, but in particular the 'wsrep_cluster_size' varaible should show 5.
+That will show a lot of data, but in particular the 'wsrep_cluster_size' variable should show 5.
 
 ```
 MariaDB [(none)]> SHOW GLOBAL STATUS LIKE 'wsrep_%';

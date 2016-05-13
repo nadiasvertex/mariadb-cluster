@@ -6,7 +6,7 @@ Vagrant.configure(2) do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/trusty64"
 
-  N = 5
+  N = 6
   (1..N).each do |machine_id|
      config.vm.define "machine#{machine_id}" do |machine|
         machine.vm.hostname = "machine#{machine_id}"
