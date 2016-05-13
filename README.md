@@ -8,9 +8,10 @@ proxy frontend.
 To run, simply execute ./boot.sh
 
 After the cluster is booted you can connect to any node. Nodes .21-.25 are data nodes. Node .26 is the HAProxy
-instance, which is configured to balance to the least-connected machine.
+instance, which is configured to balance to the least-connected machine. The HAProxy node is configured to show
+the Web UI on 192.168.77.26:1936.
 
-To connect to the proxy:
+To connect to MariaDB using the proxy:
 
 ```
 mysql --user=root --host=192.168.77.26 --password=letmein
