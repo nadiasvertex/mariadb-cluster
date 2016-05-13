@@ -1,0 +1,38 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+
+  - name: install key for mariadb repository
+    apt_key: state=present keyserver=keyserver.ubuntu.com id=0xcbcb082a1bb943db
+
+  - name: install mariadb repository
+    apt_repository: state=present repo='deb [arch=amd64,i386] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.1/ubuntu trusty main'
+
+  - name: install mysql cluster package
+    apt: state=present package=mariadb-server
+
+  - name: stop mariadb server
+    service: state=stopped name=mysql 
+
+  - name: install mariadb configuration
+    template: src=my.cnf dest=/etc/my.cnf owner=mysql
+
+- hosts: machine1
+  become: yes
+  tasks:
+
+  - name: install daemon tool
+    apt: state=present name=daemon 
+
+  - name: start first cluster node 
+    shell: daemon --user=mysql -- mysqld_safe --wsrep-new-cluster
+
+- hosts: machine2, machine3, machine4, machine5
+  become: yes
+  tasks:
+
+  - name: start the rest of the cluster
+    service: state=started name=mysql
+
+
